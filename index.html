@@ -1,0 +1,62 @@
+<!-- 
+	Author: Wesley Richards 
+	Date: 16-Oct-2014
+
+	I have decided to use AngularJS MVC and the Angular UI Bootstrap.  As a
+	result of using Angular UI Bootstrap there is no need to additionally load
+	the bootstrap js files.
+ -->
+ <!-- The VIEW of the one page app -->
+<!doctype html>
+<html lang="en" ng-app="myApp">
+	<head>
+		<meta charset="UTF-8">
+		<title>News Feed Demo</title>
+		<script src="js/angular/angular.min.js"></script>
+		<script src="js/ui-bootstrap-tpls-0.11.2.min.js"></script>
+		<script src="js/controllers.js"></script>
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/styles.css?v1">
+	</head>
+	<body>	
+		<div class="container" ng-controller="yahoofeed">
+			<h1>The Latest News</h1>
+			<div class="search">
+				<h2>Filter The News</h2>
+				<!-- Input bound to the newsfeed objects to allow the user to filter the news content -->
+				<input ng-model="filternews.title" placeholder="Search the news title" autofocus>
+			</div>
+			
+
+			<div id="newscontent">
+				<!-- Message the user when we are waiting for the feed to load -->
+				<alert type="warning" ng-show="!newsLoaded && !loadError" style="text-align:center;font-size:1.5em;color:">Your news is loading...</alert>
+				<!-- Display an alert error message when there is a problem loading the feed -->
+				 <alert type="danger" ng-show="loadError" >There is a problem loading the news - Please try again shortly.</alert>
+				<accordion close-others="true">
+					<!-- A list of accordions, limited to a max of 10, to show the news objests from our data -->
+					<!-- Also add a filter here which is bound to the filter input box above.  It wil only filter on the news title -->
+					<accordion-group ng-repeat="news in newsfeed.value.items | limitTo: 10 | filter: filternews" is-open="status.open">
+						<accordion-heading>
+            				{{news.title}} <span class="pull-right"><i class="glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></span>
+			        	</accordion-heading>
+						<!-- Some of the news objects do not have a media ojects, therefore there is no image, so in this case we display a generic image to keep the view uniform -->
+						<img class="newsimg" ng-if="news['media:content']" ng-src="{{news['media:content'].url}}" width="150">
+						<img class="newsimg" ng-if="!news['media:content']" src="images/noimage.jpg" width="150">
+						<div>
+							<!-- Display the date of the news item -->
+							<div style="text-align:right;font-weight:bold;">
+								{{news['y:published'].day_name + ', ' + news['y:published'].day + ' ' + news['y:published'].month_name + ' ' + news['y:published'].year}} </div>
+							<!-- **ISSUE** There are somethimes HTML elements in the description body - the ng-bind-html-unsafe directive has been remove.  Need to find an alternative method...  -->
+							<div> {{news.description}} </div>
+							<!-- Display a link to the original news source -->
+							<div style="text-align:right;"><a href="{{news.link}}">[Read the full story]</a></div>
+						</div>
+
+					</accordion-group>
+				</accordion>
+			</div>
+
+		</div>		
+	</body>
+</html>
